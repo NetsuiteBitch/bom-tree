@@ -1,0 +1,15 @@
+#contextmenucontainer {
+    width: 300px;
+    height: 400px;
+    position: absolute;
+    background-color: black;
+    color: white;
+    z-index: 2;
+    top: 207px;
+    left: 513px;
+    background-color: #494949;
+    border: 2px solid black;
+    border-radius: 13px;
+    box-shadow: 2px 2px 2px 2px #cecece;
+
+}

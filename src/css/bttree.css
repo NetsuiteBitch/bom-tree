@@ -1,0 +1,118 @@
+
+.leaflevel0 {
+    margin-left: 30px;
+}
+
+.leaflevel1 {
+    margin-left: 60px;
+}
+
+.leaflevel2 {
+    margin-left: 90px;
+}
+
+.nodelevel1 {
+    margin-left: 30px;
+}
+
+
+.treecontainer {
+    width: 1000px;
+    margin: 80px
+}
+
+.nodelevel2 {
+    margin-left: 60px;
+}
+/* 
+.nodelevel2 {
+    margin-left: 90px;
+} */
+
+
+.unselectedicon {
+    padding-right: 7px;
+}
+
+.selectedicon {
+    transform: rotate(90deg);
+    padding-top: 7px;
+    transition: 0.1s ease-in;
+}
+
+
+
+.itemid{
+    width: 100px;
+}
+
+.pipe{
+    width: 50px;
+}
+
+.itemname {
+    width: 300px;
+}
+
+.nodeitemname{
+    width: 200px;
+}
+
+.node {
+    padding: 5px;
+}
+
+.nodeitemquantity {
+    width: 70px;
+}
+
+
+.nodeitemdescription {
+    width: 500px;
+}
+
+
+.nodeitem {
+    display: inline-block;
+    color: 'darkgrey';
+    white-space: nowrap;
+    word-break: break-all;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    color: black;
+}
+
+.leafspan{
+    display: inline-block;
+    white-space: nowrap;
+    word-break: break-all;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    color: black;
+}
+
+
+.searchbar {
+    width: 200px;
+    min-width: fit-content;
+    height: 30px;
+    font-size: 18pt;
+}
+
+
+.searchbar::placeholder {
+    font-size: small;
+    line-height: 30px;
+    height: 30px;
+}
+
+
+.itemquantity{
+    margin-left: 50px;
+    width: 75px;
+}
+
+
+.leafdeets {
+    padding: 5px;
+}
