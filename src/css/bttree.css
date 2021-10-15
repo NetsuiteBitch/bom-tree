@@ -16,18 +16,28 @@
 }
 
 
-.treecontainer {
-    width: 1000px;
-    margin: 80px
-}
 
 .nodelevel2 {
     margin-left: 60px;
 }
-/* 
-.nodelevel2 {
-    margin-left: 90px;
-} */
+
+.nodelevel3 {
+    margin-left: 120px;
+}
+
+.nodelevel4 {
+    margin-left: 150px;
+}
+
+.nodelevel5 {
+    margin-left: 180px;
+}
+
+
+.treecontainer {
+    width: 1000px;
+    margin: 80px
+}
 
 
 .unselectedicon {

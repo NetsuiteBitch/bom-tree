@@ -81,13 +81,10 @@ function BTTree() {
 
                 size='full'
                 LeafRenderer={leaf}
-                nodes={showingdata}  
+                nodes={data}  
                 NodeRenderer={(node)}
                 animations={true}
              >
-            {(controls) => {
-                return <button onClick={() => controls.toggleOpenCloseAllNodes()}>Toggle All</button>
-            }}
             </Tree>}
             {searchterm.length > 3 && showingdata?.length == 0 ? <div>No Results</div>:''}
         </div>
