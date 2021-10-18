@@ -5,10 +5,13 @@ import React, { useEffect, useState } from 'react'
 import BTContextMenu from './BTContextMenu'
 
 import '../css/bttree.css'
+import { getnodes } from '../utils/netsuite'
 
 function BTTree() {
 
-    const data = testass.map(x => {var o = x; o.items = testitems.filter((item) => item.parentId === x.id); return o})
+    const [nodes, setNodes] = useState([])
+    getnodes().then(x => setNodes(x))
+    const data = nodes.map(x => {var o = x; o.items = testitems.filter((item) => item.parentId === x.id); return o})
     const [mousex, setmousex] = useState(0)
     const [mousey, setmousey] = useState(0)
     const [showingContextMenu, setshowingContextMenu] = useState(false)
