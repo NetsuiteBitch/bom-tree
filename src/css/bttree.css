@@ -106,6 +106,10 @@
     color: black;
 }
 
+.newweight {
+    margin-left: 10px;
+}
+
 .leafspan{
     display: inline-block;
     white-space: nowrap;

@@ -1,9 +1,12 @@
 import Tree from '@naisutech/react-tree'
 import { useEffect, useState } from 'react'
 import '../css/btdetails.css'
-import { getformula, getformulaitems, getpackagingitemsdeets, getspicebagitems, getspicebags } from '../utils/netsuite'
+import { packagingleaf, ingleaf } from './Leaves'
+import { formulanode, spicenode } from './Nodes'
+import { getformula, getformulaitems, getformulaweight, getpackagingitemsdeets, getspicebagitems, getspicebags } from '../utils/netsuite'
 
-function BTDetails({deets}) {
+
+function BTDetails({ deets }) {
 
     const [topitem, settopitem] = useState(deets.id)
     const [packagingtreenode, setpackagingtreenode] = useState([{
@@ -15,31 +18,44 @@ function BTDetails({deets}) {
     const [packagingitems, setpackagingitems] = useState([])
     const [formulatreenode, setFormulaTreeNode] = useState([])
     const [formulaitemid, setFormulaItemid] = useState(null)
-    const [spicebagmainnode, setSpiceBagMainNode] = useState([{ 
-        label: 'Spice Bags', 
-        id:  1000000000,
+    const [spicebagmainnode, setSpiceBagMainNode] = useState([{
+        label: 'Spice Bags',
+        id: 1000000000,
         parentId: null,
         items: []
     }])
 
-
+    const [formulaweight, setFormulaWeight] = useState(null)
     const [formulaspicebags, setformulaspicebags] = useState([])
+    const [newformulaweight, setNewFormulaWeight] = useState(1)
+    const [formulascale, setFormulaScale] = useState(1)
 
-    useEffect(() => {getformula(topitem).then(x => {console.log('responseformula',x); setFormulaTreeNode(x); setFormulaItemid(x[0].id)})}, [topitem])
+
+    //change scale on change newformulaweight
+
+    useEffect(() => {setFormulaScale(newformulaweight/formulaweight)}, [newformulaweight])
+
+    //set formula weight
+    useEffect(() => { getformulaweight(formulaitemid).then(x => { setFormulaWeight(x); setNewFormulaWeight(x) }) }, [formulaitemid])
+
+    //get current formula for item
+    useEffect(() => { getformula(topitem).then(x => { setFormulaTreeNode(x); setFormulaItemid(x[0].id) }) }, [topitem])
+
+    //getpackaging deetails
     useEffect(() => { getpackagingitemsdeets(topitem).then(x => setpackagingitems(x)) }, [topitem])
 
+    // add spice bag items to spice bag nodes
     useEffect(() => {
         var currentformulaspicebags = formulaspicebags
-        currentformulaspicebags.forEach((bag,i) => {
+        currentformulaspicebags.forEach((bag, i) => {
 
             getspicebagitems(bag.id).then(x => {
                 currentformulaspicebags[i].items = currentformulaspicebags[i].items || []
-                currentformulaspicebags[i].items  = x
+                currentformulaspicebags[i].items = x
             })
 
         })
 
-        console.log(currentformulaspicebags)
 
 
         var currentspicebagmainnode = spicebagmainnode;
@@ -49,9 +65,10 @@ function BTDetails({deets}) {
     }, [formulaspicebags])
 
 
+    // get spice bag nodes
     useEffect(() => {
         getspicebags(formulaitemid).then(x => {
-            if(spicebagmainnode[0]){
+            if (spicebagmainnode[0]) {
                 setformulaspicebags(x);
             }
         })
@@ -59,69 +76,55 @@ function BTDetails({deets}) {
     }, [formulaitemid])
 
 
-
-    useEffect(() => {getformulaitems(formulaitemid).then(x => {
-        if(formulatreenode[0]){
-            const currentformulanode = formulatreenode
-            currentformulanode[0].items = x
-            setFormulaTreeNode(currentformulanode)
-        }
-    })},[formulaitemid])
-
-
+    //get formula items
     useEffect(() => {
-        const currentpackagingnode =  packagingtreenode
+        getformulaitems(formulaitemid).then(x => {
+            if (formulatreenode[0]) {
+                const currentformulanode = formulatreenode
+                currentformulanode[0].items = x
+                setFormulaTreeNode(currentformulanode)
+            }
+        })
+    }, [formulaitemid])
+
+
+    // add packaging items to nodes
+    useEffect(() => {
+        const currentpackagingnode = packagingtreenode
         currentpackagingnode[0].items = packagingitems
         setpackagingtreenode(currentpackagingnode)
     }, [packagingitems])
 
-    console.log({deets})
 
 
 
-    const leaf = ({data, selected, level}) => {
-
-        return <div className={"leafdeets leaflevel"+level} style={{color: 'dodgerblue', textDecoration:"none"}}>
-            <span className="leafspan"><i style={{color: 'dodgerblue'}} className="fa fa-circle-o"></i></span>
-            <span>&nbsp;</span>
-            <span className="itemid leafspan">{data.label}</span>
-            <span className="itemname leafspan">{data.displayname}</span>
-            <span className="itemquantity leafspan">{data.qty_adjusted}</span>
-            <span className="itemunit leafspan">{data.units}</span>
-            </div>
-
-    }
-
-
-    const node = ({data, isOpen,isRoot, selected, level}) => {
-
-        return <div className={'node nodelevel'+ level} >
-            <span className="nodeitem nodeicon"><i className={isOpen? "fa fa-angle-right selectedicon": 'fa fa-angle-right unselectedicon'} style={{color: 'dodgerblue', fontSize: '15pt', width: '20px', textAlign: 'center'}}></i></span>
-            <span className="nodeitem nodeitemname">{data.label}</span>
-            <span className="nodeitem nodeitemdescription">{data.description}</span>
-            <span className="nodeitem nodeitemquantity">{data.qty_on_bom}</span>
-            {data.qty_on_bom ? <span className="nodeitem nodeitemquantity">EA</span> : ''}
-            </div>
-    }
 
 
 
-    if(deets.type != 'parentassembly'){
+    if (deets.type != 'parentassembly') {
         return (<div id="itemdeetsbox">
             <h3>Only Parent Items Are Supported</h3>
-                </div>)
-    }else {
+        </div>)
+    } else {
 
 
-    return (
-        <div id="itemdeetsbox">
-            <h3 style={{textAlign: 'center'}} >{deets.label}</h3>
-            {console.log({formulatreenode})}
-            <Tree nodes={packagingtreenode}></Tree>
-            <Tree nodes={formulatreenode}></Tree>
-            <Tree nodes={spicebagmainnode}></Tree>
-        </div>
-    )
+        return (
+            <div style={{display:"flex"}}>
+                <div id="itemdeetsbox">
+                    <h3 style={{ textAlign: 'center' }} >{deets.label}-{deets.description}</h3>
+                    <Tree theme={"light"} nodes={packagingtreenode} LeafRenderer={packagingleaf} ></Tree>
+                    {console.log('rendered weight', formulaweight)}
+                    <Tree theme={"light"} nodes={formulatreenode} LeafRenderer={(args) => {args["scale"] = formulascale; return ingleaf(args)}} NodeRenderer={(args) => { args["weight"] = formulaweight; args["scale"] = formulascale;return formulanode(args) }}></Tree>
+                    <Tree theme={"light"} nodes={spicebagmainnode} LeafRenderer={(args) => {args["scale"] = formulascale; return ingleaf(args)}} NodeRenderer={(args) => { args["weight"] = formulaweight; args["scale"] = formulascale;return spicenode(args) }} ></Tree>
+                </div>
+                <div id="itemtoolbox">
+                    <h3 style={{ textAlign: 'center' }} >Tools</h3>
+                    <div>Adjust Formula Weight</div>
+                    <input type="range" min="20" max="2000" defaultValue={formulaweight} step="1" name="adjust" onChange={(e) => setNewFormulaWeight(e.target.value)}/>
+                    <div>{newformulaweight}</div>
+                </div>
+            </div>
+        )
     }
 }
 

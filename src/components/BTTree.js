@@ -1,12 +1,10 @@
 
 import Tree from '@naisutech/react-tree'
-import {testass, testitems} from '../testdata'
 import React, { useEffect, useState } from 'react'
 import BTContextMenu from './BTContextMenu'
 
 import '../css/bttree.css'
 import { getitemdeets, getnodes } from '../utils/netsuite'
-import { getNodeText } from '@testing-library/dom'
 
 function BTTree({setCurrentItemDetails}) {
 
@@ -29,7 +27,7 @@ function BTTree({setCurrentItemDetails}) {
     useEffect(() => getnodes().then(x => {setNodesQuery(x)}), [])
     useEffect(() => getitemdeets().then(x => {setItemsQuery(x)}), [nodesquery])
     useEffect(() => {setNodes(nodesquery.map(x => {var o = x; o.items = itemsquery.filter((item) => item.parentId === x.id); return o}))}, [itemsquery])
-    useEffect(() => {setShowingNodes(nodes.filter(x => {return x.label.includes(searchterm) || x.description?.includes(searchterm) || x.parentId }))},[nodes, searchterm])
+    useEffect(() => {setShowingNodes(nodes.filter(x => {console.log('samplenode',x);return x.label.includes(searchterm) || x.description?.toLowerCase()?.includes(searchterm) || x.parentId }))},[nodes, searchterm])
 
     // useEffect(() => {setNodes(nodesquery.map(x => {var o = x; o.items = testitems.filter((item) => item.parentId === x.id); return o})); setshowingdata(nodes)}, [])
 
@@ -37,6 +35,16 @@ function BTTree({setCurrentItemDetails}) {
 
     const gotogoogle = () => window.location.href = 'https://www.google.com'
 
+
+
+    const generatecontextmenu = (e, data) =>{
+        e.preventDefault()
+        setmousex(e.pageX)
+        setmousey(e.pageY)
+        setcontexmenudata(data)
+        setshowingContextMenu(true)
+        setcontexMenuEvent(e)
+    }
 
     const leaf = ({data, selected, level}) => {
 
@@ -49,15 +57,6 @@ function BTTree({setCurrentItemDetails}) {
             <span className="itemunit leafspan">{data.units}</span>
             </div>
 
-    }
-
-    const generatecontextmenu = (e, data) =>{
-        e.preventDefault()
-        setmousex(e.pageX)
-        setmousey(e.pageY)
-        setcontexmenudata(data)
-        setshowingContextMenu(true)
-        setcontexMenuEvent(e)
     }
 
     const node = ({data, isOpen,isRoot, selected, level}) => {
@@ -90,7 +89,7 @@ function BTTree({setCurrentItemDetails}) {
              />}
 
             <div>
-                <input className="searchbar" placeholder="Please enter at least 3 characters to search" onChange={(e) => setSearchTerm(e.target.value)} type="text" />
+                <input className="searchbar" placeholder="Please enter at least 4 characters to search" onChange={(e) => setSearchTerm(e.target.value)} type="text" />
             </div>
 
             {searchterm.length > 3  && <Tree

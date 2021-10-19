@@ -178,7 +178,9 @@ export function getformulaitems(formulaiid){
         INNER JOIN bomrevisioncomponentmember ON bomrevisioncomponentmember.bomrevision = bomrevision.id
         INNER JOIN item AS RMITEM ON RMITEM.id = bomRevisionComponentMember.item
         INNER JOIN unitstypeuom AS buom ON buom.internalid = bomRevisionComponentMember.units
-        where bomassembly.assembly = ${formulaiid}`
+        where bomassembly.assembly = ${formulaiid}
+        and sysdate between bomrevision.effectivestartdate and bomrevision.effectiveenddate
+        `
 
     return executequery(sql).then(x => x.map(y => { var o = y; y.parentId = y.parentid; delete o.parentid; return o }))
 }
@@ -199,6 +201,7 @@ export function getspicebags(formulaiid){
         INNER JOIN unitstypeuom AS buom ON buom.internalid = bomRevisionComponentMember.units
         where bomassembly.assembly = ${formulaiid}
         and rmitem.itemtype = 'Assembly'
+        and sysdate between bomrevision.effectivestartdate and bomrevision.effectiveenddate
     `
     return executequery(sql).then(x => x.map(y => { var o = y; y.parentId = y.parentid; delete o.parentid; return o }))
 
@@ -238,8 +241,77 @@ export async function getspicebagitems(spicebagiid){
         INNER JOIN item AS RMITEM ON RMITEM.id = bomRevisionComponentMember.item
         INNER JOIN unitstypeuom AS buom ON buom.internalid = bomRevisionComponentMember.units
         where bomassembly.assembly = ${spicebagiid}
+        and  sysdate between bomrevision.effectivestartdate and bomrevision.effectiveenddate
     `
 
     return await executequery(sql).then(x => x.map(y => { var o = y; y.parentId = y.parentid; delete o.parentid; return o }))
 
+}
+
+
+export function getformulaweight(formulaiid){
+    var sql = `
+    SELECT sum(quantity) as quantity
+from(
+SELECT
+  ROUND(CASE
+    WHEN rmitem.unitstype = 50 THEN (1/16) * bomrevisioncomponentmember.quantity * buom.conversionrate
+    ELSE bomrevisioncomponentmember.quantity * buom.conversionrate
+  END, 2) AS quantity
+  
+FROM
+  bomassembly
+  INNER JOIN bom ON bom.id = bomassembly.billofmaterials
+  INNER JOIN bomrevision ON bomrevision.billofmaterials = bom.id
+  INNER JOIN bomrevisioncomponentmember ON bomrevisioncomponentmember.bomrevision = bomrevision.id
+  INNER JOIN item AS RMITEM ON RMITEM.id = bomRevisionComponentMember.item
+  INNER JOIN unitstypeuom AS buom ON buom.internalid = bomRevisionComponentMember.units
+  where rmitem.itemtype != 'Assembly'
+  and  sysdate between bomrevision.effectivestartdate and bomrevision.effectiveenddate
+  and bomassembly.assembly = ${formulaiid}
+
+
+UNION ALL
+
+SELECT
+  ROUND(
+    CASE
+      WHEN rmitem.unitstype = 50 THEN (1 / 16) * bomrevisioncomponentmember.quantity * buom.conversionrate
+      ELSE bomrevisioncomponentmember.quantity * buom.conversionrate
+    END,
+    2
+  ) * bags.quantity  as itemquantity
+FROM
+  bomassembly
+  INNER JOIN bom ON bom.id = bomassembly.billofmaterials
+  INNER JOIN bomrevision ON bomrevision.billofmaterials = bom.id
+  INNER JOIN bomrevisioncomponentmember ON bomrevisioncomponentmember.bomrevision = bomrevision.id
+  INNER JOIN item AS RMITEM ON RMITEM.id = bomRevisionComponentMember.item
+  INNER JOIN unitstypeuom AS buom ON buom.internalid = bomRevisionComponentMember.units
+  INNER JOIN (
+    SELECT
+      bomrevisioncomponentmember.item AS itemiid,
+      bomrevisioncomponentmember.quantity
+    FROM
+      bomassembly
+      INNER JOIN bom ON bom.id = bomassembly.billofmaterials
+      INNER JOIN bomrevision ON bomrevision.billofmaterials = bom.id
+      INNER JOIN bomrevisioncomponentmember ON bomrevisioncomponentmember.bomrevision = bomrevision.id
+      INNER JOIN item AS RMITEM ON RMITEM.id = bomRevisionComponentMember.item
+      INNER JOIN unitstypeuom AS buom ON buom.internalid = bomRevisionComponentMember.units
+    WHERE
+      rmitem.itemtype = 'Assembly'
+      AND sysdate BETWEEN bomrevision.effectivestartdate
+      AND bomrevision.effectiveenddate
+      AND bomassembly.assembly = ${formulaiid}
+  ) as bags on bomassembly.assembly = bags.itemiid
+  
+WHERE
+  rmitem.itemtype != 'Assembly'
+  AND sysdate BETWEEN bomrevision.effectivestartdate
+  AND bomrevision.effectiveenddate
+)
+    `
+
+    return executequery(sql).then(x => x[0].quantity)
 }

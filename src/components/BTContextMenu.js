@@ -4,7 +4,7 @@ import '../css/btcontextmenu.css'
 
 function BTContextMenu({mousex, mousey, event, hidecontextmenu, data, setCurrentItemDetails}) {
     const menuref = useRef(null)
-    console.log({data})
+
     useEffect(()=> menuref.current.focus() ,[])
 
 
