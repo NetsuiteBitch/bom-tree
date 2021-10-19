@@ -1,0 +1,8 @@
+
+#itemdeetsbox {
+    min-width: 800px;
+    min-height: 500px;
+    border: 2px solid black;
+    margin: 15px;
+    margin-top: 86px;
+}
