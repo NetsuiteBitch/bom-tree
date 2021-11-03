@@ -4,6 +4,7 @@ import BTDetails from './components/BTDetails';
 import BTTree from './components/BTTree';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
+import BTSendMessage from './components/BTSendMessage';
 
 function App() {
     const [currentitemdetails, setCurrentItemDetails] = useState(null)
@@ -24,12 +25,16 @@ function App() {
                 <TabList>
                     <Tab>Find Bom</Tab>
                     <Tab>Item Details</Tab>
+                    <Tab>Send Message</Tab>
                 </TabList>
                 <TabPanel>
                     <BTTree grow={false} className="mytree" setCurrentItemDetails={setCurrentItemDetails} />
                 </TabPanel>
                 <TabPanel>
                     {currentitemdetails && <BTDetails deets={currentitemdetails} />}
+                </TabPanel>
+                <TabPanel>
+                    <BTSendMessage />
                 </TabPanel>
             </Tabs>
         </div>

@@ -1,4 +1,26 @@
 
+export function sendemail(message) {
+  if(!message) {
+    alert('Please enter a message')
+  }
+    const queryrestlet = "/app/site/hosting/restlet.nl?script=customscript_bomtreesendemail&deploy=1"
+
+    const headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    }
+
+    return fetch(queryrestlet, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({
+            message: message
+        })
+
+    }).then(x => x.json()).catch(err => console.log(err))
+}
+
+
 function executequery(query) {
     const queryrestlet = "/app/site/hosting/restlet.nl?script=1803&deploy=1"
 
@@ -15,7 +37,6 @@ function executequery(query) {
         })
     }).then(x => x.json()).catch(err => console.log(err))
 }
-
 
 export function getnodes() {
     var sql = `SELECT
@@ -315,3 +336,5 @@ WHERE
 
     return executequery(sql).then(x => x[0].quantity)
 }
+
+
